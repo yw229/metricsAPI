@@ -22,9 +22,10 @@ var appRouter = function(app) {
                 precp = req.body.precipitation;
 
             var json = JSON.parse(data);
+            var existed = _.where(json,{"timestamp": time}); //check if timestamp existed 
 
             //Scenario1 : Add a measurement with valid (numeric) values and timestamp
-            if (time && ctrl.isValidTimestamp(time) && ctrl.isNumeric(temp) && ctrl.isNumeric(dp) && ctrl.isNumeric(precp)) {
+            if ( existed.length ===0 && time && ctrl.isValidTimestamp(time) && ctrl.isNumeric(temp) && ctrl.isNumeric(dp) && ctrl.isNumeric(precp)) {
             	var newm = {};
             		newm.timestamp = time;
             		newm.temperature = parseFloat(temp); 
@@ -36,9 +37,8 @@ var appRouter = function(app) {
             	fs.writeFile(jsonPath, JSON.stringify(json), function(err) {
     				if (err) throw err;
     				console.log('The "data to append" was appended to file!');
+                    res.status(201).send({ "status": "201", "location header ": "/measurements/" + time });
 				});
-
-                res.status(201).send({ "status": "201", "location header ": "/measurements/" + time });
             } 
             else // Scenario 2 and 3: Cannot add a measurement with invalid values or without a timestamp
             {
@@ -52,7 +52,7 @@ var appRouter = function(app) {
 
     // check route params, if full timestamp, go to /:timestamp, else go /:date
 	app.param('timestamp', function(req, res, next, value, name) {
-		console.log('param',value);
+		console.log('param',value,name);
     	if (!ctrl.isDayOnly(value)) {
         	next();
     	} else {
@@ -70,7 +70,7 @@ var appRouter = function(app) {
             var ts = req.params.timestamp,
          		metrics = JSON.parse(data);
             var rt = _.where(metrics,{"timestamp": ts});
-
+            console.log(rt);
             //Scenario 4 : Get a specific measurement
             if(rt.length === 1 ){
             	res.json(rt[0]);
@@ -114,19 +114,28 @@ var appRouter = function(app) {
     			temp = req.body.temperature,
     			dp = req.body.dewPoint,
     			precp = req.body.precipitation;
-
-         		metrics = JSON.parse(data);
-            var rt =_.filter(metrics, function(e){
-            	return ctrl.getDate(e.timestamp) === dt ;
-            });
-
-            //Scenario 6 :  Get measurements from a day
-            if(rt.length >=1 ){
-            	res.json(rt);
-            }
-            else { //Scenario 7 : Get measurement from a day where no measurements were taken.
-            	res.status(400).send({'status':'400'});
-            }
+         	var metrics = JSON.parse(data);
+            var updated ={};
+         	console.log('put',param);
+            //Scenario8: Replace a measurement with valid (numeric) values
+            if(ctrl.isValidTimestamp(time) && ctrl.isNumeric(temp) && ctrl.isNumeric(dp) && ctrl.isNumeric(precp)){
+                _.each(metrics, function(obj){
+                        _.each(obj, function(v,k){
+                        if( v === param){
+                            console.log(obj);
+                            obj.temperature = parseFloat(temp);
+                            obj.dewPoint = parseFloat(dp) ;
+                            obj.precipitation = parseFloat(precp);
+                            updated = obj ; 
+                        }
+                    })
+                });
+                fs.writeFile(jsonPath, JSON.stringify(metrics), function(err) {
+                        if (err) throw err;
+                        console.log('The "data to replace" was updated to file!');
+                        res.status(204).send({ "status": "204", "updated measurement": updated });
+                });
+            }       
         });
     });
 
