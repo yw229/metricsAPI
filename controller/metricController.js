@@ -9,7 +9,7 @@ var mCtrl = {
         return !isNaN(parseFloat(v)) && isFinite(v);
     },
     isValidTimestamp: function(t){ //
-    	return moment(t, moment.ISO_8601).isValid();
+    	return moment(t, "YYYY-MM-DDTHH:mm:ss.SSSS[Z]", true).isValid();
     },
     getDate: function(t){ // extract year-month-date 
     	return moment(t).format('YYYY-MM-DD');
