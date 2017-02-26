@@ -164,9 +164,69 @@ var appRouter = function(app) {
                 if( existed.length===0){
                     res.status(404).send({ "status": "404" ,"error":"measurement does not exist"});
                 }
-
         });
     });
+
+    //Update measurement partially
+    app.patch("/measurements/:timestamp", function(req, res) {
+
+        fs.readFile(jsonPath, 'utf8', function(err, data) {
+            if (err) throw err;
+            
+            var param = req.params.timestamp;
+            var time = req.body.timestamp,
+                temp = req.body.temperature,
+                dp = req.body.dewPoint,
+                precp = req.body.precipitation;
+            var metrics = JSON.parse(data),
+                existed = _.where(metrics,{"timestamp": param}), //check if timestamp existed 
+                updated ={};
+            console.log('patch',param,time,temp,dp,precp,existed);
+            
+            //measurement exists 
+            if(existed.length===1){
+                    if(param === time){
+                        //Scenario 13 : Update metrics of a measurement with invalid values
+                        if( (temp&&!ctrl.isNumeric(temp)) || (dp&&!ctrl.isNumeric(dp)) || (precp&&!ctrl.isNumeric(precp))){
+                                res.status(400).send({ "status": "400","measurement": existed[0]});
+                            }
+                        else
+                        //Scenario12: update a measurement with valid (numeric) values
+                        {
+                            _.each(metrics, function(obj){
+                                    _.each(obj, function(v,k){
+                                    if( v === param){
+                                        if ( temp && ctrl.isNumeric(temp))
+                                            obj.temperature = parseFloat(temp);
+                                        if ( dp && ctrl.isNumeric(dp))
+                                            obj.dewPoint = parseFloat(dp) ;
+                                        if ( precp && ctrl.isNumeric(precp))
+                                            obj.precipitation = parseFloat(precp);
+                                        updated = obj ; 
+                                    }
+                                })
+                            });
+                            console.log('updated',updated);
+                            fs.writeFile(jsonPath, JSON.stringify(metrics), function(err) {
+                                if (err) throw err;
+                                console.log('The "data to update" was updated to file!');
+                                res.status(204).send({ "status": "204", "updated measurement": updated });
+                            });
+                        }
+                        
+                }
+                else{ //Scenario 14: Update metrics of a measurement with mismatched timestamps
+                    res.status(409).send({ "status": "409", "measurement": existed[0] });
+                }
+                
+            }
+            else  // Scenario 15 : Update a measurement that does not exist
+                if( existed.length===0){
+                    res.status(404).send({ "status": "404" ,"error":"measurement does not exist"});
+                }
+        });
+    });
+
 
 
 }
