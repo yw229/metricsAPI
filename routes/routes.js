@@ -227,6 +227,43 @@ var appRouter = function(app) {
         });
     });
 
+    //Delete a measurement 
+    app.delete("/measurements/:timestamp", function(req, res) {
+
+        fs.readFile(jsonPath, 'utf8', function(err, data) {
+            if (err) throw err;
+            
+            var param = req.params.timestamp;
+            var time = req.body.timestamp,
+                temp = req.body.temperature,
+                dp = req.body.dewPoint,
+                precp = req.body.precipitation;
+            var metrics = JSON.parse(data),
+                existed = _.where(metrics,{"timestamp": param}), //check if timestamp existed 
+                deleted = {};
+            console.log('delete',param,time,existed);
+            
+            //measurement exists 
+            if(existed.length===1){ //Scenario16 :  Delete a specific measurement
+                
+                var rest = _.filter(metrics, function(e){
+                    return e.timestamp !== param ;
+                });
+                deleted = existed;
+                console.log(deleted, rest) ; 
+                fs.writeFile(jsonPath, JSON.stringify(rest), function(err) {
+                        if (err) throw err;
+                        console.log('The "data to delete" was updated to file!');
+                        res.status(204).send({ "status": "204",'deleted measurement':deleted});
+                    });
+                } 
+            else  // Scenario17: Delete a measurement that does not exist
+                if( existed.length===0){
+                    res.status(404).send({ "status": "404" ,"error":"measurement for "+param+"does not exist","measurements":metrics});
+                }
+        });
+    });
+
 
 
 }
