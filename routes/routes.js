@@ -5,11 +5,11 @@ var path = require("path");
 var _ = require("underscore");
 
 var jsonPath = path.join(__dirname, '..', 'models','metrics.json');
+var statsPath = path.join(__dirname, '..', 'models','statistics.json');
 var ctrl = require('../controller/metricController.js');
 
 var appRouter = function(app) {
-
-    
+   
     app.post('/measurements',function(req,res){
 
   		fs.readFile(jsonPath, 'utf8', function(err, data) {
@@ -36,6 +36,7 @@ var appRouter = function(app) {
                     fs.writeFile(jsonPath, JSON.stringify(json), function(err) {
                         if (err) throw err;
                         console.log('The "data to append" was appended to file!');
+                        res.setHeader('Location', '/measurements/' + time);
                         res.status(201).send({ "status": "201", "location header ": "/measurements/" + time });
                     });
                 }
@@ -259,10 +260,71 @@ var appRouter = function(app) {
                 } 
             else  // Scenario17: Delete a measurement that does not exist
                 if( existed.length===0){
-                    res.status(404).send({ "status": "404" ,"error":"measurement for "+param+"does not exist","measurements":metrics});
+                    res.status(404).send({ "status": "404" ,"error":"measurement for "+param+" does not exist","measurements":metrics});
                 }
         });
     });
+
+    //Get measurement statistics
+    app.get("/stat", function(req, res) {
+
+        fs.readFile(statsPath, 'utf8', function(err, data) {
+            if (err) throw err;
+
+            var st = req.query.stat,
+                metr = req.query.metric,
+                from = req.query.fromDateTime ,
+                to = req.query.toDateTime,
+                json = JSON.parse(data);
+            var ret = [];
+            
+            typeof st ==='string' ? st =[st] : st ;
+            typeof metr ==='string' ? metr = [metr]:metr ; 
+            console.log( st, metr,from,to); 
+
+            var fltime = _.filter(json, function(e){
+                return e.timestamp>=from&&e.timestamp<to;
+            });
+
+            //Scenario: Get stats for more than one metric
+            _.each(metr,function(m){
+                    //Scenario: Get stats for a sparsely reported metric
+                    var filt = _.filter(fltime,function(f){
+                        //console.log(m,f);
+                        return (m in f) && f[m] !=="" && f[m]!==undefined &&f[m]!==null ;
+                    });
+                    var min ={}, max ={}; 
+                    console.log('filt',filt);
+                    //Get stats for a well-reported metric
+                    if(filt.length>0){ //filter out metric not reported 
+                            _.each(st,function(s){
+                            if(s==='min'){
+                                min = _.min(filt, _.property(m));
+                                ret.push({'metric':m,'stat':s,'value':min[m]});
+                            }else if(s === 'max'){
+                                max = _.max(filt, _.property(m));
+                                ret.push({'metric':m,'stat':s,'value':max[m]});
+                            }
+                            else if(s ==='average' && min && max){
+                                ret.push({'metric':m,'stat':s,'value':(min[m]+max[m])/2});
+                            }
+                        })
+
+                    }                   
+
+            });
+            
+            if(ret.length >0 ){
+                res.status(200).json(ret);
+            }
+            else{ //Get stats for a metric that has never been reported
+                res.status(200).send('[]');
+            }
+
+            
+        });
+    });
+
 
 
 
