@@ -31,13 +31,13 @@ var appRouter = function(app) {
                         newm.dewPoint = parseFloat(dp); 
                         newm.precipitation = parseFloat(precp);
                     json.push(newm);
-                    console.log(json);
+                    //console.log(json);
 
                     fs.writeFile(jsonPath, JSON.stringify(json), function(err) {
                         if (err) throw err;
                         console.log('The "data to append" was appended to file!');
-                        res.setHeader('Location', '/measurements/' + time);
-                        res.status(201).send({ "status": "201", "location header ": "/measurements/" + time });
+                        res.header('Location', "/measurements/" + time);
+                        res.status(201).send({ "status": "201", "Location": "/measurements/" + time });
                     });
                 }
                 else  // Scenario 2: Cannot add a measurement with invalid values
@@ -61,7 +61,7 @@ var appRouter = function(app) {
 
     // check route params, if full timestamp, go to /:timestamp, else go /:date
 	app.param('timestamp', function(req, res, next, value, name) {
-		console.log('param',value);
+		//console.log('param',value);
     	if (ctrl.isValidTimestamp(value)) {
         	next();
     	} else if(ctrl.isDayOnly(value)){
@@ -78,11 +78,11 @@ var appRouter = function(app) {
 
         fs.readFile(jsonPath, 'utf8', function(err, data) {
             if (err) throw err;
-            console.log('time'); 
+            //console.log('time'); 
             var ts = req.params.timestamp,
          		metrics = JSON.parse(data);
             var rt = _.where(metrics,{"timestamp": ts});
-            console.log(rt);
+            //console.log(rt);
             //Scenario 4 : Get a specific measurement
             if(rt.length === 1 ){
             	res.json(rt[0]);
@@ -319,14 +319,9 @@ var appRouter = function(app) {
             }
             else{ //Get stats for a metric that has never been reported
                 res.status(200).send('[]');
-            }
-
-            
+            }           
         });
     });
-
-
-
 
 }
 
