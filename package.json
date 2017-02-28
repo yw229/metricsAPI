@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node server.js ",
-    "test": "mocha ./test/test.js",
+    "start": "NODE_ENV=dev node server.js ",
+    "test": "NODE_ENV=test mocha test",
     "prepare": "npm update && npm cache clear && ncu -u"
   },
   "devDependencies": {
