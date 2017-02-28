@@ -129,7 +129,7 @@ var appRouter = function(app) {
          	var metrics = JSON.parse(data),
                 existed = _.where(metrics,{"timestamp": param}), //check if timestamp existed 
                 updated ={};
-         	console.log('put',param,time,existed);
+         	//console.log('put',param,time,existed);
             
             //measurement exists 
             if(existed.length===1){
@@ -138,7 +138,7 @@ var appRouter = function(app) {
                     _.each(metrics, function(obj){
                             _.each(obj, function(v,k){
                             if( v === param){
-                                console.log(obj);
+                                //console.log(obj);
                                 obj.temperature = parseFloat(temp);
                                 obj.dewPoint = parseFloat(dp) ;
                                 obj.precipitation = parseFloat(precp);
