@@ -1,5 +1,6 @@
 var should = require("should");
 var request = require("supertest");
+var url = require('url');
 var app = require('../server.js');
 var agent = request.agent(app);  
 
@@ -85,7 +86,7 @@ describe("metrics unit test", function() {
             });
     });
 
-    it(" Get a measurement that does not exist", function(done) {	
+    it("Get a measurement that does not exist", function(done) {	
             agent.get("/measurements/"+"2015-09-01T16:50:00.000Z")
             .expect(404) // THis is HTTP response
             .end(function(err, res) {
@@ -277,9 +278,90 @@ describe("metrics unit test", function() {
     });
 
     // Get measurement statistics Unit Test 
+    it(" Get stats for a well-reported metric", function(done) {
+    		var unit = "/stat?stat=min&stat=max&stat=average&fromDateTime=2015-09-01T16:00:00.000Z&toDateTime=2015-09-01T17:00:00.000Z&metric=temperature";
+    		var queryParams = url.parse(unit, true);	
+            var stat = queryParams.query.stat,
+            	from = queryParams.query.fromDateTime,
+            	to = queryParams.query.toDateTime,
+            	metric = queryParams.query.metric;
+        	console.log(stat,from,to,metric);
+            agent.get(unit)
+            .expect(200) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(200);
+                res.body.should.be.instanceof(Array).and.have.lengthOf(3);
+                res.body.should.eql([{ 'metric': 'temperature', 'stat': 'min', 'value': 27.1 },
+    								{ 'metric': 'temperature', 'stat': 'max', 'value': 27.5 },
+    								{ 'metric': 'temperature', 'stat': 'average', 'value': 27.3 }]);
+                //console.log(res.body);
+                done();
+            });
+    });
 
+    it(" Get stats for a sparsely reported metric", function(done) {
+    		var unit = "/stat?stat=min&stat=max&stat=average&fromDateTime=2015-09-01T16:00:00.000Z&toDateTime=2015-09-01T17:00:00.000Z&metric=dewPoint";
+    		var queryParams = url.parse(unit, true);	
+            var stat = queryParams.query.stat,
+            	from = queryParams.query.fromDateTime,
+            	to = queryParams.query.toDateTime,
+            	metric = queryParams.query.metric;
+        	console.log(stat,from,to,metric);
+            agent.get(unit)
+            .expect(200) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(200);
+                res.body.should.be.instanceof(Array).and.have.lengthOf(3);
+                res.body.should.eql([ { 'metric': 'dewPoint', 'stat': 'min', 'value': 16.9 }, 
+                					{ 'metric': 'dewPoint', 'stat': 'max', 'value': 17.3 }, 
+                					{ 'metric': 'dewPoint', 'stat': 'average','value': 17.1 }]) ; 
+                done();
+            });
+    });
 
+    it("Get stats for a metric that has never been reported", function(done) {
+    		var unit = "/stat?stat=min&stat=max&stat=average&fromDateTime=2015-09-01T16:00:00.000Z&toDateTime=2015-09-01T17:00:00.000Z&metric=precipitation";
+    		var queryParams = url.parse(unit, true);	
+            var stat = queryParams.query.stat,
+            	from = queryParams.query.fromDateTime,
+            	to = queryParams.query.toDateTime,
+            	metric = queryParams.query.metric;
+        	console.log(stat,from,to,metric);
+            agent.get(unit)
+            .expect(200) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(200);
+                res.body.should.be.instanceof(Array).and.have.lengthOf(0);
+                //console.log(res.body);
+                done();
+            });
+    });
 
-
+    it(" Get stats for more than one metric", function(done) {
+    		var unit = "/stat?stat=min&stat=max&stat=average&fromDateTime=2015-09-01T16:00:00.000Z&toDateTime=2015-09-01T17:00:00.000Z&metric=temperature&metric=dewPoint";
+    		var queryParams = url.parse(unit, true);	
+            var stat = queryParams.query.stat,
+            	from = queryParams.query.fromDateTime,
+            	to = queryParams.query.toDateTime,
+            	metric = queryParams.query.metric;
+        	console.log(stat,from,to,metric);
+            agent.get(unit)
+            .expect(200) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(200);
+                res.body.should.be.instanceof(Array).and.have.lengthOf(6);
+                res.body.should.eql([{ 'metric': 'temperature', 'stat': 'min', 'value': 27.1 },
+    								{ 'metric': 'temperature', 'stat': 'max', 'value': 27.5 },
+    								{ 'metric': 'temperature', 'stat': 'average', 'value': 27.3 },
+    								{ 'metric': 'dewPoint', 'stat': 'min', 'value': 16.9 },
+    								{ 'metric': 'dewPoint', 'stat': 'max', 'value': 17.3 },
+    								{ 'metric': 'dewPoint', 'stat': 'average', 'value': 17.1 }]);
+                done();
+            });
+    });
 
 });

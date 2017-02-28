@@ -251,7 +251,7 @@ var appRouter = function(app) {
                     return e.timestamp !== param ;
                 });
                 deleted = existed;
-                console.log(deleted, rest) ; 
+                //console.log(deleted, rest) ; 
                 fs.writeFile(jsonPath, JSON.stringify(rest), function(err) {
                         if (err) throw err;
                         console.log('The "data to delete" was updated to file!');
@@ -280,12 +280,12 @@ var appRouter = function(app) {
             
             typeof st ==='string' ? st =[st] : st ;
             typeof metr ==='string' ? metr = [metr]:metr ; 
-            console.log( st, metr,from,to); 
+            //console.log( st, metr,from,to); 
 
             var fltime = _.filter(json, function(e){
                 return e.timestamp>=from&&e.timestamp<to;
             });
-
+             //console.log('fltime',fltime);
             //Scenario: Get stats for more than one metric
             _.each(metr,function(m){
                     //Scenario: Get stats for a sparsely reported metric
@@ -294,7 +294,7 @@ var appRouter = function(app) {
                         return (m in f) && f[m] !=="" && f[m]!==undefined &&f[m]!==null ;
                     });
                     var min ={}, max ={}; 
-                    console.log('filt',filt);
+                    //console.log('filt',filt);
                     //Get stats for a well-reported metric
                     if(filt.length>0){ //filter out metric not reported 
                             _.each(st,function(s){
@@ -318,7 +318,7 @@ var appRouter = function(app) {
                 res.status(200).json(ret);
             }
             else{ //Get stats for a metric that has never been reported
-                res.status(200).send('[]');
+                res.status(200).send(ret);
             }           
         });
     });
