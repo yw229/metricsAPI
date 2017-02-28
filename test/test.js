@@ -6,7 +6,7 @@ var agent = request.agent(app);
 
 describe('server response', function () {
   before(function () {
-    app.listen(3000);
+    app.listen(8080);
   });
 
   after(function () {
@@ -101,8 +101,8 @@ describe("metrics unit test", function() {
             .expect(200) // THis is HTTP response
             .end(function(err, res) {
                 // HTTP status should be 200
-                res.body.length.should.equal(6); // 6 records within arry
                 res.status.should.equal(200);
+                res.body.should.be.instanceof(Array);
                 done();
             });
     });

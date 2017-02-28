@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "node server.js ",
-    "test": "mocha ./test/test.js"
+    "test": "mocha ./test/test.js",
+    "prepare": "npm update && npm cache clear && ncu -u"
   },
   "devDependencies": {
     "body-parser": "^1.16.1",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "jsonfile": "^2.4.0",
-    "moment": "^2.17.1"
+    "moment": "^2.17.1",
+    "npm-check-updates": "^2.10.3"
   }
 }
