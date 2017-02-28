@@ -104,45 +104,6 @@ describe("metrics unit test", function() {
             .end(function(err, res) {
                 // HTTP status should be 200
                 res.status.should.equal(200);
-                res.body.should.be.instanceof(Array).and.have.lengthOf(6);
-                res.body.should.eql([
-                          {
-                            "timestamp": "2015-09-01T16:00:00.000Z",
-                            "temperature": 27.1,
-                            "dewPoint": 16.7,
-                            "precipitation": 15.2
-                          },
-                          {
-                            "timestamp": "2015-09-01T16:10:00.000Z",
-                            "temperature": 27.3,
-                            "dewPoint": 16.9,
-                            "precipitation": 0
-                          },
-                          {
-                            "timestamp": "2015-09-01T16:20:00.000Z",
-                            "temperature": 27.5,
-                            "dewPoint": 17.1,
-                            "precipitation": 0
-                          },
-                          {
-                            "timestamp": "2015-09-01T16:30:00.000Z",
-                            "temperature": 27.4,
-                            "dewPoint": 17.3,
-                            "precipitation": 12.3
-                          },
-                          {
-                            "timestamp": "2015-09-01T16:40:00.000Z",
-                            "temperature": 27.2,
-                            "dewPoint": 17.2,
-                            "precipitation": 0
-                          },
-                          {
-                            "timestamp": "2015-09-01T16:24:00.000Z",
-                            "temperature": 27.1,
-                            "dewPoint": 16.7,
-                            "precipitation": 0
-                          }
-                ]);
                 done();
             });
     });
