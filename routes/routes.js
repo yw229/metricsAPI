@@ -104,7 +104,7 @@ var appRouter = function(app,jsonPath,statsPath) {
             var rt =_.filter(metrics, function(e){
             	return ctrl.getDate(e.timestamp) === dt ;
             });
-
+            //console.log(rt);
             //Scenario 6 :  Get measurements from a day
             if(rt.length >=1 ){
             	res.json(rt);

@@ -29,7 +29,7 @@ http.createServer(app);
 
  
 var a = app.listen(port, host, function () {
-    console.log("Listening on host %s,port %s...",host,port,process.env.NODE_ENV,jsonPath);
+    console.log("Listening on host %s,port %s.,Node Env is %s..",host,port,process.env.NODE_ENV);
 });
 
 
