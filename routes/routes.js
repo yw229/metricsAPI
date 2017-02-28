@@ -4,11 +4,11 @@ var fs = require("fs");
 var path = require("path");
 var _ = require("underscore");
 
-var jsonPath = path.join(__dirname, '..', 'models','metrics.json');
-var statsPath = path.join(__dirname, '..', 'models','statistics.json');
+//var jsonPath = path.join(__dirname, '..', 'models','metrics.json');
+//var statsPath = path.join(__dirname, '..', 'models','statistics.json');
 var ctrl = require('../controller/metricController.js');
 
-var appRouter = function(app) {
+var appRouter = function(app,jsonPath,statsPath) {
    
     app.post('/measurements',function(req,res){
 

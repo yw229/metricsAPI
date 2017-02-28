@@ -4,9 +4,10 @@ var url = require('url');
 var app = require('../server.js');
 var agent = request.agent(app);  
 
+console.log(app.jsonPath);
 describe('server response', function () {
   before(function () {
-    app.listen(8080);
+    app.listen(3000);
   });
 
   after(function () {
