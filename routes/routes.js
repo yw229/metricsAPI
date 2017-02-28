@@ -88,7 +88,7 @@ var appRouter = function(app) {
             	res.json(rt[0]);
             }
             else if(rt.length === 0 ){ //Scenario 5 : Get a measurement that does not exist
-            	res.status(400).send({'status':'400','error':'measurement does not exist'});
+            	res.status(404).send({'status':'404','error':'measurement does not exist'});
             }
         });
     });
@@ -110,7 +110,7 @@ var appRouter = function(app) {
             	res.json(rt);
             }
             else { //Scenario 7 : Get measurement from a day where no measurements were taken.
-            	res.status(400).send({'status':'400'});
+            	res.status(404).send({'status':'404'});
             }
         });
     });

@@ -86,4 +86,51 @@ describe("metrics unit test", function() {
                 done();
             });
     });
+
+    it(" Get a measurement that does not exist", function(done) {	
+            agent.get("/measurements/"+"2015-09-01T16:50:00.000Z")
+            .expect("Content-type", /json/)
+            .expect(404) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 404
+                res.status.should.equal(404);
+                done();
+            });
+    });
+
+    it("Get measurements from a day", function(done) {	
+            agent.get("/measurements/"+"2015-09-01")
+            .expect("Content-type", /json/)
+            .expect(200) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.body.length.should.equal(6); // 6 records within arry
+                res.status.should.equal(200);
+                done();
+            });
+    });
+
+    it("Get measurements from a day", function(done) {	
+            agent.get("/measurements/"+"2015-09-01")
+            .expect("Content-type", /json/)
+            .expect(200) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.body.length.should.equal(6); // 6 records within arry
+                res.status.should.equal(200);
+                done();
+            });
+    });
+
+    it("Get measurements from a day where no measurements were taken", function(done) {	
+            agent.get("/measurements/"+"2015-09-03")
+            .expect("Content-type", /json/)
+            .expect(404) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(404);
+                done();
+            });
+    });
+
 });
