@@ -285,7 +285,7 @@ describe("metrics unit test", function() {
             	from = queryParams.query.fromDateTime,
             	to = queryParams.query.toDateTime,
             	metric = queryParams.query.metric;
-        	console.log(stat,from,to,metric);
+        	//console.log(stat,from,to,metric);
             agent.get(unit)
             .expect(200) // THis is HTTP response
             .end(function(err, res) {
@@ -307,7 +307,7 @@ describe("metrics unit test", function() {
             	from = queryParams.query.fromDateTime,
             	to = queryParams.query.toDateTime,
             	metric = queryParams.query.metric;
-        	console.log(stat,from,to,metric);
+        	//console.log(stat,from,to,metric);
             agent.get(unit)
             .expect(200) // THis is HTTP response
             .end(function(err, res) {
@@ -328,7 +328,7 @@ describe("metrics unit test", function() {
             	from = queryParams.query.fromDateTime,
             	to = queryParams.query.toDateTime,
             	metric = queryParams.query.metric;
-        	console.log(stat,from,to,metric);
+        	//console.log(stat,from,to,metric);
             agent.get(unit)
             .expect(200) // THis is HTTP response
             .end(function(err, res) {
@@ -347,7 +347,7 @@ describe("metrics unit test", function() {
             	from = queryParams.query.fromDateTime,
             	to = queryParams.query.toDateTime,
             	metric = queryParams.query.metric;
-        	console.log(stat,from,to,metric);
+        	//console.log(stat,from,to,metric);
             agent.get(unit)
             .expect(200) // THis is HTTP response
             .end(function(err, res) {

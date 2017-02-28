@@ -182,7 +182,7 @@ var appRouter = function(app) {
             var metrics = JSON.parse(data),
                 existed = _.where(metrics,{"timestamp": param}), //check if timestamp existed 
                 updated ={};
-            console.log('patch',param,time,temp,dp,precp,existed);
+            //console.log('patch',param,time,temp,dp,precp,existed);
             
             //measurement exists 
             if(existed.length===1){
@@ -207,7 +207,7 @@ var appRouter = function(app) {
                                     }
                                 })
                             });
-                            console.log('updated',updated);
+                            //console.log('updated',updated);
                             fs.writeFile(jsonPath, JSON.stringify(metrics), function(err) {
                                 if (err) throw err;
                                 console.log('The "data to update" was updated to file!');
@@ -242,7 +242,7 @@ var appRouter = function(app) {
             var metrics = JSON.parse(data),
                 existed = _.where(metrics,{"timestamp": param}), //check if timestamp existed 
                 deleted = {};
-            console.log('delete',param,time,existed);
+            //console.log('delete',param,time,existed);
             
             //measurement exists 
             if(existed.length===1){ //Scenario16 :  Delete a specific measurement
