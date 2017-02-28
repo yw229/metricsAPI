@@ -106,17 +106,6 @@ describe("metrics unit test", function() {
             });
     });
 
-    it("Get measurements from a day", function(done) {	
-            agent.get("/measurements/"+"2015-09-01")
-            .expect(200) // THis is HTTP response
-            .end(function(err, res) {
-                // HTTP status should be 200
-                res.body.length.should.equal(6); // 6 records within arry
-                res.status.should.equal(200);
-                done();
-            });
-    });
-
     it("Get measurements from a day where no measurements were taken", function(done) {	
             agent.get("/measurements/"+"2015-09-03")
             .expect(404) // THis is HTTP response
@@ -166,21 +155,21 @@ describe("metrics unit test", function() {
     });
 
     it("Replace a measurement with mismatched timestamps", function(done) {	
-            agent.put("/measurements/"+"2015-09-01T16:00:00.000Z")
+            agent.put("/measurements/"+"2015-09-01T16:10:00.000Z")
             .send({
-        		"timestamp": "2015-09-02T16:00:00.000Z",
-        		"temperature":  27.1 ,
-        		"dewPoint":   16.7  ,
+        		"timestamp": "2015-09-02T16:10:00.000Z",
+        		"temperature":  27.3 ,
+        		"dewPoint":   16.9  ,
         		"precipitation": 15.2 
     		})
             .expect(409) // THis is HTTP response
             .end(function(err, res) {
-                // HTTP status should be  404
+                // HTTP status should be  409
                 res.status.should.equal(409);
-                res.body.measurement.timestamp.should.equal('2015-09-01T16:00:00.000Z');
-                res.body.measurement.temperature.should.equal(27.1);
-                res.body.measurement.dewPoint.should.equal(16.7);
-                res.body.measurement.precipitation.should.equal(15.2);
+                res.body.measurement.timestamp.should.equal('2015-09-01T16:10:00.000Z');
+                res.body.measurement.temperature.should.equal(27.3);
+                res.body.measurement.dewPoint.should.equal(16.9);
+                res.body.measurement.precipitation.should.equal(0);
                 done();
             });
     });
@@ -197,10 +186,99 @@ describe("metrics unit test", function() {
             .end(function(err, res) {
                 // HTTP status should be  404
                 res.status.should.equal(404);
-                //console.log(res.body);
                 done();
             });
     });
+
+    //PATCH unit test 
+    it(" Update metrics of a measurement with valid (numeric) values", function(done) {	
+            agent.patch("/measurements/"+"2015-09-01T16:30:00.000Z")
+            .send({
+            	"timestamp": "2015-09-01T16:30:00.000Z",
+        		"precipitation":  12.3 ,
+    		})
+            .expect(204) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 204
+                res.status.should.equal(204);
+                done();
+            });
+    });
+
+    it(" Update metrics of a measurement with invalid values", function(done) {	
+            agent.patch("/measurements/"+"2015-09-01T16:40:00.000Z")
+            .send({
+            	"timestamp": "2015-09-01T16:40:00.000Z",
+        		"precipitation":  "not a number" ,
+    		})
+            .expect(400) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 400
+                res.status.should.equal(400);
+                res.body.measurement.timestamp.should.equal('2015-09-01T16:40:00.000Z');
+                res.body.measurement.temperature.should.equal(27.2);
+                res.body.measurement.dewPoint.should.equal(17.2);
+                res.body.measurement.precipitation.should.equal(0);
+                done();
+            });
+    });
+
+    it(" Update metrics of a measurement with mismatched timestamps", function(done) {	
+            agent.patch("/measurements/"+"2015-09-01T16:40:00.000Z")
+            .send({
+            	"timestamp": "2015-09-02T16:40:00.000Z",
+        		"precipitation": 12.3
+    		})
+            .expect(409) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 409
+                res.status.should.equal(409);
+                res.body.measurement.timestamp.should.equal('2015-09-01T16:40:00.000Z');
+                res.body.measurement.temperature.should.equal(27.2);
+                res.body.measurement.dewPoint.should.equal(17.2);
+                res.body.measurement.precipitation.should.equal(0);
+                done();
+            });
+    });
+
+    it("Update metrics of a measurement that does not exist", function(done) {	
+            agent.patch("/measurements/"+"2015-09-02T16:40:00.000Z")
+            .send({
+            	"timestamp": "2015-09-02T16:40:00.000Z",
+        		"precipitation": 12.3
+    		})
+            .expect(404) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 404
+                res.status.should.equal(404);
+                done();
+            });
+    });
+
+    //DELETE unit test 
+    it("Delete a specific measurement", function(done) {	
+            agent.delete("/measurements/"+"2015-09-01T16:24:00.000Z") // pick the test which I added at first place
+            .expect(204) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 204
+                res.status.should.equal(204);
+                done();
+            });
+    });
+
+    it("Delete a measurement that does not exist", function(done) {	
+            agent.delete("/measurements/"+"2015-09-01T16:24:00.000Z") // pick the above test which I just deleted 
+            .expect(404) // THis is HTTP response
+            .end(function(err, res) {
+                // HTTP status should be 204
+                res.status.should.equal(404);
+                done();
+            });
+    });
+
+    // Get measurement statistics Unit Test 
+
+
 
 
 
